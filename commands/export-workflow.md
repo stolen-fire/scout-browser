@@ -1,11 +1,11 @@
 ---
-description: Export the current browser session as a replayable workflow (Python script + portable JSON)
+description: Export the current browser session as a replayable Python workflow script
 argument-hint: "[workflow-name]"
 allowed-tools:
   - "mcp__plugin_scout_scout__*"
 ---
 
-Generate both a self-contained Python script and a portable workflow JSON file from the current browser session. Follow these steps precisely:
+Generate a self-contained Python script from the current browser session. Follow these steps precisely:
 
 ## Step 1: Get the session history
 
@@ -159,31 +159,6 @@ Never use fixed `time.sleep(N)` in generated scripts. All inter-step delays must
 
 The `human_type()` helper already includes per-keystroke jitter (30-120ms) so no additional delay is needed after typing steps that are immediately followed by another type action on the same form.
 
-## Step 5b: Generate workflow JSON
-
-In addition to the Python script, generate a portable workflow JSON file. Structure:
-
-```json
-{
-  "name": "<workflow-name>",
-  "description": "<short summary of key actions>",
-  "version": "1.0",
-  "steps": [
-    {
-      "name": "<human-readable step description>",
-      "action": "<action type>",
-      "selector": "<CSS selector if applicable>",
-      "value": "<value if applicable>",
-      "frame_context": "<iframe context if not main>"
-    }
-  ],
-  "base_url": "<first navigation URL>",
-  "credentials": ["<env var names used>"]
-}
-```
-
-Build this from the `get_session_history` output. Each successful action becomes a step. Credential values are replaced with `${ENV_VAR}` references. The JSON file is the portable, machine-parseable workflow definition that can be consumed by any executor without requiring Claude in the loop.
-
 ## Step 6: Determine the workflow name
 
 - If the user provided a name as an argument, use it (slugified: lowercase, hyphens for spaces)
@@ -198,11 +173,7 @@ Write a self-contained directory package to `workflows/<name>/`. Create the dire
 
 Write to `workflows/<name>/<name>.py`.
 
-### 7b: Write the workflow JSON
-
-Write to `workflows/<name>/<name>.json`.
-
-### 7c: Write requirements.txt
+### 7b: Write requirements.txt
 
 Write to `workflows/<name>/requirements.txt`:
 
@@ -217,7 +188,7 @@ python-dotenv>=1.0.0
 botasaurus-driver>=4.0.0
 ```
 
-### 7d: Write .env.example (conditional)
+### 7c: Write .env.example (conditional)
 
 **Only create this file if credential variables were detected in Step 4.**
 
@@ -242,7 +213,7 @@ BC_USERNAME=
 BC_PASSWORD=
 ```
 
-### 7e: Present quick-start instructions
+### 7d: Present quick-start instructions
 
 Tell the user the directory path and show a quick-start block:
 
@@ -261,6 +232,4 @@ pip install -r requirements.txt
 python <name>.py
 ```
 
-Also mention:
-- That the JSON file is the portable workflow definition for use with any executor
-- What they need to update (BASE_URL if targeting a different environment)
+Also mention what they need to update (BASE_URL if targeting a different environment).
