@@ -338,16 +338,59 @@ To:
     )
 ```
 
-- [ ] **Step 4: Run tests to verify no regressions**
+- [ ] **Step 4: Write integration test for navigate action port threading**
 
-Run: `cd D:\Projects\scout-mcp && python -m pytest tests/ -v --timeout=30`
-Expected: ALL PASS — the new parameter defaults to `None`, preserving existing behavior.
+Add to `D:\Projects\scout-mcp\tests\test_validation.py`:
 
-- [ ] **Step 5: Commit**
+```python
+class TestExecuteActionNavigateLocalhostPort:
+    """Verify execute_action threads allow_localhost_port to validate_url for navigate."""
+
+    def test_navigate_blocks_localhost_without_port(self):
+        """Navigate to localhost is blocked when allow_localhost_port is None."""
+        from unittest.mock import MagicMock
+        from scout.actions import execute_action
+
+        driver = MagicMock()
+        result, _record = execute_action(driver, "navigate", value="http://localhost:3000")
+        assert not result.success
+        assert "Blocked URL host" in result.error
+
+    def test_navigate_allows_localhost_with_matching_port(self):
+        """Navigate to localhost succeeds when allow_localhost_port matches."""
+        from unittest.mock import MagicMock
+        from scout.actions import execute_action
+
+        driver = MagicMock()
+        result, _record = execute_action(
+            driver, "navigate", value="http://localhost:3000", allow_localhost_port=3000
+        )
+        assert result.success
+        driver.get.assert_called_once_with("http://localhost:3000")
+
+    def test_navigate_blocks_localhost_with_wrong_port(self):
+        """Navigate to localhost:6379 is blocked when allow_localhost_port=3000."""
+        from unittest.mock import MagicMock
+        from scout.actions import execute_action
+
+        driver = MagicMock()
+        result, _record = execute_action(
+            driver, "navigate", value="http://localhost:6379", allow_localhost_port=3000
+        )
+        assert not result.success
+        assert "Blocked URL host" in result.error
+```
+
+- [ ] **Step 5: Run all tests**
+
+Run: `cd D:\Projects\scout-mcp && python -m pytest tests/test_validation.py -v`
+Expected: ALL PASS
+
+- [ ] **Step 6: Commit**
 
 ```bash
 cd D:\Projects\scout-mcp
-git add src/scout/actions.py src/scout/server.py
+git add src/scout/actions.py src/scout/server.py tests/test_validation.py
 git commit -m "feat: thread allow_localhost_port through execute_action"
 ```
 
@@ -402,7 +445,26 @@ Add to the `launch_session` docstring (after the `allowed_domains` description):
                              overrides this to allow all ports.
 ```
 
-- [ ] **Step 3: Pass to `BrowserSession` constructor**
+- [ ] **Step 3: Add localhost URL hint for better error messages**
+
+In `D:\Projects\scout-mcp\src\scout\server.py`, add a check after the `connection_mode` validation block (after the profile+extension check, before the `async with app_ctx._launch_lock` line). This detects when a caller passes a localhost URL without `allow_localhost_port` and returns a helpful hint instead of a generic "Blocked URL host" error:
+
+```python
+    # Hint: detect localhost URL without allow_localhost_port
+    if url and allow_localhost_port is None:
+        from urllib.parse import urlparse as _urlparse
+        _parsed = _urlparse(url)
+        _host = (_parsed.hostname or "").lower()
+        _env_allow = os.environ.get("SCOUT_ALLOW_LOCALHOST", "").lower() in ("1", "true", "yes")
+        if not _env_allow and (_host in ("localhost",) or _host.startswith("127.") or _host == "::1"):
+            _port = _parsed.port or (443 if _parsed.scheme == "https" else 80)
+            return {
+                "error": f"Localhost navigation is blocked by default. "
+                f"To access {url}, pass allow_localhost_port={_port} to launch_session."
+            }
+```
+
+- [ ] **Step 4: Pass to `BrowserSession` constructor**
 
 In `D:\Projects\scout-mcp\src\scout\server.py:219-226`, change:
 
@@ -431,12 +493,12 @@ To:
         )
 ```
 
-- [ ] **Step 4: Run tests to verify no regressions**
+- [ ] **Step 5: Run tests to verify no regressions**
 
 Run: `cd D:\Projects\scout-mcp && python -m pytest tests/ -v --timeout=30`
 Expected: ALL PASS
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 cd D:\Projects\scout-mcp
