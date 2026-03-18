@@ -1,0 +1,15 @@
+{
+  "name": "scout-browser",
+  "owner": {
+    "name": "stemado"
+  },
+  "plugins": [
+    {
+      "name": "scout",
+      "version": "1.0.0",
+      "source": "./",
+      "description": "Give Claude Code a browser. Scout page structure, interact with websites, and export replayable automations.",
+      "keywords": ["browser", "automation", "web-scraping", "workflow", "browser-automation"]
+    }
+  ]
+}
