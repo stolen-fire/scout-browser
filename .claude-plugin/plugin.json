@@ -1,6 +1,6 @@
 {
   "name": "scout",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Give Claude Code a browser. Scout page structure, interact with websites, and export replayable automations.",
   "license": "MIT",
   "repository": "https://github.com/stemado/scout-browser",

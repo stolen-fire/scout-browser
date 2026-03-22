@@ -1,6 +1,6 @@
 # Scout — Browser Automation for Claude Code
 
-[![Version](https://img.shields.io/badge/version-1.1.1-blue)](https://github.com/stemado/scout-browser/releases)
+[![Version](https://img.shields.io/badge/version-1.1.2-blue)](https://github.com/stemado/scout-browser/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![MCP Server](https://img.shields.io/npm/v/@stemado/scout-mcp?label=scout-mcp)](https://www.npmjs.com/package/@stemado/scout-mcp)
 

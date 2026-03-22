@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "scout",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "source": "./",
       "description": "Give Claude Code a browser. Scout page structure, interact with websites, and export replayable automations.",
       "keywords": ["browser", "automation", "web-scraping", "workflow", "browser-automation"]
