@@ -1,3 +1,37 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Development Guide
+
+This is a **configuration-only Claude Code plugin** — no executable code, no tests, no CI. The repo contains markdown, JSON, one shell script, and skill definitions. The actual browser automation logic lives in the separate `scout-mcp` package.
+
+### Version Tracking
+
+Version is tracked in **3 files** that must stay in sync:
+- `.claude-plugin/plugin.json` — `"version": "X.Y.Z"`
+- `.claude-plugin/marketplace.json` — `"version": "X.Y.Z"`
+- `README.md` — badge URL contains `version-X.Y.Z-blue`
+
+Use `/release <patch|minor|major>` to bump. It handles `plugin.json` and `marketplace.json` automatically but **the README badge must be updated manually**.
+
+### Project Structure
+
+- `skills/` — Plugin skills (SKILL.md with YAML frontmatter). These are for plugin **users**, not developers.
+- `hooks/` — Plugin hooks (hooks.json + check-deps.sh). SessionStart dependency check, always exits 0.
+- `.claude-plugin/` — Plugin manifest and marketplace metadata.
+- `workflows/` — Gitignored. Exported workflow scripts live here but are not committed (except the example).
+- `docs/superpowers/` — Design specs and implementation plans for upstream `scout-mcp` features.
+
+### Conventions
+
+- Commit messages: `feat:`, `fix:`, `refactor:`, `chore:`, `release:` prefixes
+- CHANGELOG.md exists but is stale — update it when making releases
+- The `.mcp.json` references `@stemado/scout-mcp@latest` via npx
+- `check-deps.sh` is POSIX-compatible (no bash arrays) for macOS bash 3.2 compatibility
+
+---
+
 ### Scout — Browser Automation for Claude Code
 
 Scout gives you a browser. When you need to see a webpage, interact with a site, or automate a workflow — you open Scout the same way a human opens a browser tab. Scout reports cost ~200 tokens (vs ~1,600 for a screenshot), so browsing is cheap enough to be casual.

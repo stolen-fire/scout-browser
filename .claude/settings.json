@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$PROJECT_DIR\" && V1=$(jq -r '.version' .claude-plugin/plugin.json) && V2=$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json) && V3=$(grep -oP 'version-\\K[0-9]+\\.[0-9]+\\.[0-9]+' README.md | head -1) && if [ \"$V1\" = \"$V2\" ] && [ \"$V1\" = \"$V3\" ]; then echo '{\"suppressOutput\":true}'; else echo \"{\\\"systemMessage\\\":\\\"Version mismatch! plugin.json=$V1, marketplace.json=$V2, README badge=$V3\\\"}\"; fi",
+            "timeout": 10,
+            "statusMessage": "Checking version sync..."
+          }
+        ]
+      }
+    ]
+  }
+}
